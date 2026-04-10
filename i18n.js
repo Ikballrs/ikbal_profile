@@ -9,6 +9,7 @@ function setLanguage(lang) {
 
   renderList("skillsList", dict.skills, "chip");
   renderExperience("experienceList", dict.experience);
+  renderServices("servicesList", dict.services || []);
   renderList("educationList", dict.education);
   renderList("certList", dict.certs);
 
@@ -48,9 +49,45 @@ function renderExperience(targetId, items) {
   });
 }
 
+function renderServices(targetId, items) {
+  const root = document.getElementById(targetId);
+  if (!root) return;
+  root.innerHTML = "";
+
+  items.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "service-card";
+    card.innerHTML = `
+      <h3 class="text-base font-semibold text-slate-100">${item.title}</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-300">${item.body}</p>
+    `;
+    root.appendChild(card);
+  });
+}
+
+function setupRevealAnimation() {
+  const elements = document.querySelectorAll(".reveal");
+  if (!("IntersectionObserver" in window)) {
+    elements.forEach((el) => el.classList.add("show"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add("show");
+      });
+    },
+    { threshold: 0.16 }
+  );
+
+  elements.forEach((el) => observer.observe(el));
+}
+
 document.querySelectorAll(".lang-btn").forEach((btn) => {
   btn.addEventListener("click", () => setLanguage(btn.dataset.lang));
 });
 
 const savedLang = localStorage.getItem("profile_lang") || "jp";
 setLanguage(savedLang);
+setupRevealAnimation();
